@@ -3,7 +3,6 @@
 import * as React from 'react';
 import {
 	ColumnDef,
-	Row,
 	flexRender,
 	getCoreRowModel,
 	getFilteredRowModel,
@@ -13,6 +12,7 @@ import {
 	SortingState,
 	useReactTable
 } from '@tanstack/react-table';
+import type { FilterFn, Row } from '@tanstack/react-table';
 import { ClaimRow, Status } from '@/types';
 import { formatUSD, formatD, formatT } from '@/lib/format';
 import Spinner from './Spinner';
@@ -134,9 +134,10 @@ export default function DataTable({ initialPageSize = 10 }: Props) {
 	], []);
 
 	// Global filter = "name contains"
-	const globalFilterFn = React.useCallback((row: Row<ClaimRow>, _columnId: string, filterValue: string) => {
-		const v = (row.original.patientName as string).toLowerCase();
-		return v.includes(filterValue.toLowerCase());
+	const globalFilterFn = React.useCallback<FilterFn<ClaimRow>>((row: Row<ClaimRow>, _columnId, filterValue) => {
+		const value = String(filterValue ?? '').toLowerCase();
+		const patient = row.original.patientName.toLowerCase();
+		return patient.includes(value);
 	}, []);
 
 	// Single-select status column filter
