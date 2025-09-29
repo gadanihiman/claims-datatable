@@ -253,7 +253,7 @@ export default function DataTable({ initialPageSize = 10 }: Props) {
 						<div className="flex items-center gap-3">
 							<div className="relative">
 								<select
-									className="appearance-none rounded-[10px] border border-gray-200 bg-white px-4 py-2 pr-8 text-sm font-semibold shadow-sm transition disabled:cursor-not-allowed disabled:opacity-60"
+									className="appearance-none rounded-[12px] border border-gray-200 bg-white px-4 py-2 pr-9 text-sm font-[400] shadow-sm transition disabled:cursor-not-allowed disabled:opacity-60"
 									value={pagination.pageSize}
 									onChange={(e) => setPagination(prev => ({
 										...prev,
@@ -264,15 +264,13 @@ export default function DataTable({ initialPageSize = 10 }: Props) {
 								>
 									{[10, 25, 50].map(n => <option key={n} value={n}>{n}</option>)}
 								</select>
-								<svg
-									className="pointer-events-none absolute right-3 top-1/2 h-3 w-3 -translate-y-1/2 text-emerald-600"
-									viewBox="0 0 12 8"
-									fill="none"
-									stroke="currentColor"
-									strokeWidth="1.5"
-								>
-									<path d="M10.5 2.25 6 6.25 1.5 2.25" strokeLinecap="round" strokeLinejoin="round" />
-								</svg>
+								<Image
+									src="/Caret Up Down from DNTEL.png"
+									alt="Toggle rows per page"
+									width={16}
+									height={16}
+									className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2"
+								/>
 							</div>
 							<span className="text-sm font-medium text-gray-600">Rows per page</span>
 						</div>
