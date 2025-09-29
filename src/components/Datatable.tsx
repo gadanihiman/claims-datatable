@@ -3,6 +3,7 @@
 import * as React from 'react';
 import {
 	ColumnDef,
+	Row,
 	flexRender,
 	getCoreRowModel,
 	getFilteredRowModel,
@@ -133,7 +134,7 @@ export default function DataTable({ initialPageSize = 10 }: Props) {
 	], []);
 
 	// Global filter = "name contains"
-	const globalFilterFn = React.useCallback((row: any, _columnId: string, filterValue: string) => {
+	const globalFilterFn = React.useCallback((row: Row<ClaimRow>, _columnId: string, filterValue: string) => {
 		const v = (row.original.patientName as string).toLowerCase();
 		return v.includes(filterValue.toLowerCase());
 	}, []);
