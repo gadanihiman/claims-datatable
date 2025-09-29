@@ -3,7 +3,7 @@
 A small, responsive data table built from a Figma spec with **sorting**, **simple filters**, and **client-side pagination**.  
 Populated with 200–300 rows of dummy data generated **at build time** and hosted on Vercel.
 
-- **Live on Vercel:** <https://claims-datatable-k8ui28tt1-gadani-himan-gurusingas-projects.vercel.app/>
+- **Live on Vercel:** <https://claims-datatable.vercel.app/>
 - **Figma (core state):** <https://www.figma.com/design/aXGS9SktFdGCTcOEubiGzt/Data-Table-Component?node-id=0-1&p=f&t=Kt9QbzLOtGT94OL5-0>
 
 ---
