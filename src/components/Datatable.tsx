@@ -212,7 +212,7 @@ export default function DataTable({ initialPageSize = 10 }: Props) {
 											<th key={h.id} className="px-4 py-3">
 												{h.isPlaceholder ? null : (
 													<div
-														className={clsx('flex items-center gap-1 text-sm font-semibold tracking-wide', h.column.getCanSort() && 'cursor-pointer select-none text-gray-600 hover:text-gray-900')}
+														className={clsx('flex items-center gap-1 text-sm font-[400] tracking-wide', h.column.getCanSort() && 'cursor-pointer select-none text-gray-600 hover:text-gray-900')}
 														onClick={h.column.getToggleSortingHandler()}
 													>
 														{flexRender(h.column.columnDef.header, h.getContext())}
