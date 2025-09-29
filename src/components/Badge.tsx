@@ -23,7 +23,7 @@ const coverageStyles: Record<CoverageType, string> = {
 export function CoverageBadge({ type = 'Primary' }: { type?: CoverageType }) {
 	return (
 		<span className={clsx(
-			'inline-flex w-fit items-center justify-center rounded-[4px] px-4 py-1 text-sm font-semibold',
+			'inline-flex w-fit items-center justify-center rounded-[4px] px-4 py-1 text-[12px] font-semibold',
 			coverageStyles[type]
 		)}>
 			{type}

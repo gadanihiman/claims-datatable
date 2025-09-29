@@ -1,4 +1,4 @@
-import './polyfills.mjs';
+// import './polyfills.mjs';
 import { faker } from '@faker-js/faker';
 import { writeFileSync, mkdirSync, existsSync } from 'node:fs';
 

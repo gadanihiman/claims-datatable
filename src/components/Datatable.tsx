@@ -47,7 +47,7 @@ export default function DataTable({ initialPageSize = 10 }: Props) {
 	const columns = React.useMemo<ColumnDef<ClaimRow>[]>(() => [
 		{
 			accessorKey: 'patientName',
-			header: Sortable('Name'),
+			header: Sortable('Patient'),
 			cell: ({ row }) => (
 				<div className="flex flex-col">
 					<span className="font-medium">{row.original.patientName}</span>
@@ -66,7 +66,7 @@ export default function DataTable({ initialPageSize = 10 }: Props) {
 			header: 'Insurance Carrier',
 			cell: info => (
 				<div className="flex flex-col gap-2">
-					<span className="uppercase leading-snug text-gray-900">{info.getValue<string>()}</span>
+					<span className="text-[12px] uppercase leading-snug text-gray-900">{info.getValue<string>()}</span>
 					<CoverageBadge type={info.row.original.coverageType ?? 'Primary'} />
 				</div>
 			),
@@ -202,7 +202,7 @@ export default function DataTable({ initialPageSize = 10 }: Props) {
 				<div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
 					<div className="overflow-x-auto">
 						<table className="min-w-full text-sm">
-							<thead className="bg-gray-50 text-left text-xs uppercase text-gray-500">
+							<thead className="bg-gray-50 text-left text-xs capitalize text-gray-500">
 							{table.getHeaderGroups().map(hg => (
 								<tr key={hg.id}>
 									{hg.headers.map(h => (
