@@ -1,3 +1,4 @@
+import './polyfills.mjs';
 import { faker } from '@faker-js/faker';
 import { writeFileSync, mkdirSync, existsSync } from 'node:fs';
 
@@ -6,6 +7,13 @@ function randomDateInLast(days) {
     const past = new Date(now);
     past.setDate(now.getDate() - Math.floor(Math.random() * days));
     return past.toISOString();
+}
+
+function randomSyncDetail() {
+    const days = faker.number.int({ min: 0, max: 6 });
+    if (days === 0) return 'Status modified today';
+    if (days === 1) return 'Status modified yesterday';
+    return `Status modified ${days} days ago`;
 }
 
 const ROWS = 250;
@@ -22,12 +30,18 @@ const data = Array.from({ length: ROWS }, (_, i) => {
         { weight: 0.1,  value: 'CALL' }
     ]);
 
+    const providerId = faker.number.int({ min: 10_000_000, max: 99_999_999 }).toString();
+
     return {
         id: faker.string.uuid(),
         patientName: `${first} ${last}`,
         patientId: faker.number.int({ min: 1000, max: 9999 }).toString(),
         serviceDate,
         insuranceCarrier: faker.company.name().toUpperCase(),
+        coverageType: faker.helpers.weightedArrayElement([
+            { weight: 0.75, value: 'Primary' },
+            { weight: 0.25, value: 'Secondary' }
+        ]),
         amountCents: faker.number.int({ min: 10000, max: 250000 }), // $100–$2,500
         status,
         lastUpdated,
@@ -35,7 +49,9 @@ const data = Array.from({ length: ROWS }, (_, i) => {
         dateSent: randomDateInLast(60),
         dateSentOrig: randomDateInLast(180),
         pmsSyncStatus: faker.helpers.arrayElement(['Synced','Not synced']),
-        provider: `Dr. ${faker.person.firstName()} ${faker.person.lastName()}`
+        pmsSyncStatusDetail: randomSyncDetail(),
+        provider: `Dr. ${faker.person.firstName()} ${faker.person.lastName()}`,
+        providerId
     };
 });
 
