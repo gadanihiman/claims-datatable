@@ -134,7 +134,7 @@ export default function DataTable({ initialPageSize = 10 }: Props) {
 	], []);
 
 	// Global filter = "name contains"
-	const globalFilterFn = React.useCallback<FilterFn<ClaimRow>>((row: Row<ClaimRow>, _columnId, filterValue) => {
+	const globalFilterFn = React.useCallback<FilterFn<ClaimRow>>((row: Row<ClaimRow>, _columnId: string, filterValue: unknown) => {
 		const value = String(filterValue ?? '').toLowerCase();
 		const patient = row.original.patientName.toLowerCase();
 		return patient.includes(value);
