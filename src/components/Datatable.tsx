@@ -12,6 +12,7 @@ import {
 	SortingState,
 	useReactTable
 } from '@tanstack/react-table';
+import Image from 'next/image';
 import type { FilterFn, Row } from '@tanstack/react-table';
 import { ClaimRow, Status } from '@/types';
 import { formatUSD, formatD, formatT } from '@/lib/format';
@@ -252,7 +253,7 @@ export default function DataTable({ initialPageSize = 10 }: Props) {
 						<div className="flex items-center gap-3">
 							<div className="relative">
 								<select
-									className="appearance-none rounded-[10px] border border-gray-200 bg-white px-4 py-2 pr-8 text-sm font-semibold text-emerald-700 shadow-sm transition focus:border-emerald-300 focus:outline-none focus:ring-2 focus:ring-emerald-200 disabled:cursor-not-allowed disabled:opacity-60"
+									className="appearance-none rounded-[10px] border border-gray-200 bg-white px-4 py-2 pr-8 text-sm font-semibold shadow-sm transition disabled:cursor-not-allowed disabled:opacity-60"
 									value={pagination.pageSize}
 									onChange={(e) => setPagination(prev => ({
 										...prev,
@@ -288,13 +289,13 @@ export default function DataTable({ initialPageSize = 10 }: Props) {
 								/>
 								<PaginationButton
 									label="Prev"
-									icon="left"
+									icon="right"
 									onClick={() => table.previousPage()}
 									disabled={loading || !table.getCanPreviousPage()}
 								/>
 								<PaginationButton
 									label="Next"
-									icon="right"
+									icon="left"
 									onClick={() => table.nextPage()}
 									disabled={loading || !table.getCanNextPage()}
 								/>
@@ -332,59 +333,30 @@ type PaginationButtonProps = {
 };
 
 function PaginationButton({ label, icon, onClick, disabled }: PaginationButtonProps) {
+	const iconSrc: Record<PaginationIcon, { src: string; rotate?: string }> = {
+		left: { src: '/Caret Left from DNTEL.png', rotate: 'rotate-180' },
+		right: { src: '/Caret Right from DNTEL.png' },
+		'double-left': { src: '/Caret Double Left from DNTEL.png' },
+		'double-right': { src: '/Caret Double Right from DNTEL.png' }
+	};
+
 	return (
 		<button
 			type="button"
 			onClick={onClick}
 			disabled={disabled}
-			className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-gray-200 bg-white text-emerald-700 shadow-sm transition hover:bg-emerald-50 disabled:cursor-not-allowed disabled:opacity-40"
+			className="inline-flex h-9 w-9 items-center justify-center rounded-[14px] border border-gray-200 bg-white shadow-sm transition hover:bg-emerald-50 disabled:cursor-not-allowed disabled:opacity-40"
 			aria-label={label}
 		>
-			<ChevronIcon variant={icon} />
+			<span className="relative flex h-4 w-4 items-center justify-center">
+				<Image
+					src={iconSrc[icon].src}
+					alt={label}
+					width={18}
+					height={18}
+					className={iconSrc[icon].rotate ? iconSrc[icon].rotate : undefined}
+				/>
+			</span>
 		</button>
-	);
-}
-
-function ChevronIcon({ variant }: { variant: PaginationIcon }) {
-	const props = {
-		className: 'h-4 w-4',
-		viewBox: '0 0 16 16',
-		fill: 'none',
-		stroke: 'currentColor',
-		strokeWidth: 1.5,
-		strokeLinecap: 'round' as const,
-		strokeLinejoin: 'round' as const
-	};
-
-	if (variant === 'left') {
-		return (
-			<svg {...props}>
-				<path d="M9.5 4L6 8l3.5 4" />
-			</svg>
-		);
-	}
-
-	if (variant === 'right') {
-		return (
-			<svg {...props}>
-				<path d="M6.5 4l3.5 4-3.5 4" />
-			</svg>
-		);
-	}
-
-	if (variant === 'double-left') {
-		return (
-			<svg {...props}>
-				<path d="M11 4L7.5 8 11 12" />
-				<path d="M8.5 4 5 8l3.5 4" />
-			</svg>
-		);
-	}
-
-	return (
-		<svg {...props}>
-			<path d="M5 4l3.5 4L5 12" />
-			<path d="M7.5 4l3.5 4-3.5 4" />
-		</svg>
 	);
 }
