@@ -67,8 +67,8 @@ export default function DataTable({ initialPageSize = 10 }: Props) {
 			header: 'Insurance Carrier',
 			cell: info => (
 				<div className="flex flex-col gap-2">
-					<span className="text-[12px] uppercase leading-snug text-gray-900">{info.getValue<string>()}</span>
-					<CoverageBadge type={info.row.original.coverageType ?? 'Primary'} />
+					<span className="text-[12px] uppercase leading-snug text-[#112A24]">{info.getValue<string>()}</span>
+					<CoverageBadge type={info.row.original.coverageType ?? 'Primary'} fullWidth />
 				</div>
 			),
 			enableSorting: false
@@ -83,7 +83,7 @@ export default function DataTable({ initialPageSize = 10 }: Props) {
 			accessorKey: 'status',
 			header: Sortable('Status'),
 			cell: info => (
-				<span className="text-[12px] font-semibold uppercase tracking-wide text-emerald-900">
+				<span className="text-[12px] uppercase tracking-wide text-emerald-900">
 					NCOF - {info.getValue<Status>()}
 				</span>
 			)
@@ -95,8 +95,8 @@ export default function DataTable({ initialPageSize = 10 }: Props) {
 				const iso = info.getValue<string>();
 				return (
 					<div className="flex flex-col leading-tight">
-						<span className="text-sm font-semibold text-emerald-900">{formatD(iso)}</span>
-						<span className="text-[11px] font-medium text-gray-500">{formatT(iso)}</span>
+						<span className="text-sm">{formatD(iso)}</span>
+						<span className="text-[11px] font-semibold text-[#74827F]">{formatT(iso)}</span>
 					</div>
 				);
 			},
@@ -106,7 +106,7 @@ export default function DataTable({ initialPageSize = 10 }: Props) {
 			accessorKey: 'userInitials',
 			header: 'User',
 			cell: info => (
-				<div className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-[#E0FEEF] text-xs font-semibold">
+				<div className="inline-flex h-[30px] w-[28px] items-center justify-center rounded-full bg-[#E0FEEF] text-sm font-semibold">
 					{info.getValue<string>()}
 				</div>
 			),
@@ -126,8 +126,8 @@ export default function DataTable({ initialPageSize = 10 }: Props) {
 			enableSorting: false,
 			cell: info => (
 				<div className="flex flex-col leading-tight">
-					<span className="text-sm font-semibold text-emerald-900">{info.getValue<string>()}</span>
-					<span className="text-xs font-medium text-gray-400">ID:{info.row.original.providerId}</span>
+					<span className="text-sm text-[#112A24]">{info.getValue<string>()}</span>
+					<span className="text-xs font-semibold text-[#B3B3B3]">ID:{info.row.original.providerId}</span>
 				</div>
 			)
 		}
@@ -159,9 +159,9 @@ export default function DataTable({ initialPageSize = 10 }: Props) {
 		manualPagination: false
 	});
 
-	if (loading) return <Spinner />;
-
-	const empty = table.getRowModel().rows.length === 0;
+	const empty = !loading && table.getRowModel().rows.length === 0;
+	const pageCount = table.getPageCount() || 1;
+	const currentPage = Math.min(table.getState().pagination.pageIndex + 1, pageCount);
 
 	return (
 		<div className="space-y-3">
@@ -189,64 +189,77 @@ export default function DataTable({ initialPageSize = 10 }: Props) {
 
 			</div>
 
-			{/* Table / Empty */}
-			{empty ? (
-				<div className="flex flex-col items-center justify-center rounded-lg border border-dashed py-16">
-					<p className="text-sm text-gray-600">No results match your filters.</p>
-					<button
-						onClick={() => { setGlobalFilter(''); setStatusFilter(''); }}
-						className="mt-3 rounded-md bg-black px-4 py-2 text-sm text-white"
-					>
-						Clear filters
-					</button>
-				</div>
-			) : (
-				<div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
-					<div className="overflow-x-auto">
-						<table className="min-w-full text-sm">
-							<thead className="bg-gray-50 text-left text-xs capitalize text-gray-500">
-							{table.getHeaderGroups().map(hg => (
-								<tr key={hg.id}>
-									{hg.headers.map(h => (
-										<th key={h.id} className="px-4 py-3">
-											{h.isPlaceholder ? null : (
-												<div
-													className={clsx('flex items-center gap-1 text-xs font-semibold tracking-wide', h.column.getCanSort() && 'cursor-pointer select-none text-gray-600 hover:text-gray-900')}
-													onClick={h.column.getToggleSortingHandler()}
-												>
-													{flexRender(h.column.columnDef.header, h.getContext())}
-													{h.column.getCanSort() && <SortIndicator dir={h.column.getIsSorted()} />}
-												</div>
-											)}
-										</th>
+			{/* Table / Empty / Loading */}
+			<div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
+				<div className="relative min-h-[360px]">
+					{empty ? (
+						<div className="flex h-full flex-col items-center justify-center gap-3 py-16 text-center">
+							<p className="text-sm text-gray-600">No results match your filters.</p>
+							<button
+								onClick={() => { setGlobalFilter(''); setStatusFilter(''); }}
+								className="mt-1 rounded-md bg-black px-4 py-2 text-sm text-white"
+							>
+								Clear filters
+							</button>
+						</div>
+					) : (
+						<div className="overflow-x-auto">
+							<table className="min-w-full text-sm">
+								<thead className="bg-white text-left text-xs capitalize text-[#546661]">
+								{table.getHeaderGroups().map(hg => (
+									<tr key={hg.id}>
+										{hg.headers.map(h => (
+											<th key={h.id} className="px-4 py-3">
+												{h.isPlaceholder ? null : (
+													<div
+														className={clsx('flex items-center gap-1 text-sm font-semibold tracking-wide', h.column.getCanSort() && 'cursor-pointer select-none text-gray-600 hover:text-gray-900')}
+														onClick={h.column.getToggleSortingHandler()}
+													>
+														{flexRender(h.column.columnDef.header, h.getContext())}
+														{h.column.getCanSort() && <SortIndicator dir={h.column.getIsSorted()} />}
+													</div>
+												)}
+											</th>
+										))}
+									</tr>
 								))}
-							</tr>
-							))}
-							</thead>
-							<tbody>
-							{table.getRowModel().rows.map(r => (
-								<tr key={r.id} className="odd:bg-white even:bg-gray-50">
-									{r.getVisibleCells().map(c => (
-										<td key={c.id} className="px-4 py-4 align-top text-gray-900">
-											{flexRender(c.column.columnDef.cell, c.getContext())}
-										</td>
-									))}
-								</tr>
-							))}
-							</tbody>
-						</table>
-					</div>
+								</thead>
+								<tbody
+									className="divide-y divide-gray-100 text-[#112A24]"
+									style={{ fontFamily: 'PolySans, "Helvetica Neue", Arial, sans-serif', fontWeight: 400 }}
+								>
+								{table.getRowModel().rows.map(r => (
+									<tr key={r.id} className="bg-white">
+										{r.getVisibleCells().map(c => (
+											<td key={c.id} className="px-4 py-4 align-top text-left">
+												{flexRender(c.column.columnDef.cell, c.getContext())}
+											</td>
+										))}
+									</tr>
+								))}
+								</tbody>
+							</table>
+						</div>
+					)}
+					{loading ? (
+						<div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center bg-white/80 backdrop-blur-sm">
+							<Spinner size="lg" label="Loading claims…" />
+						</div>
+					) : null}
+				</div>
+				{empty ? null : (
 					<div className="flex flex-wrap items-center justify-between gap-4 border-t border-gray-100 px-6 py-5">
 						<div className="flex items-center gap-3">
 							<div className="relative">
 								<select
-									className="appearance-none rounded-full border border-gray-200 bg-white px-4 py-2 pr-8 text-sm font-semibold text-emerald-700 shadow-sm focus:border-emerald-300 focus:outline-none focus:ring-2 focus:ring-emerald-200"
+									className="appearance-none rounded-[10px] border border-gray-200 bg-white px-4 py-2 pr-8 text-sm font-semibold text-emerald-700 shadow-sm transition focus:border-emerald-300 focus:outline-none focus:ring-2 focus:ring-emerald-200 disabled:cursor-not-allowed disabled:opacity-60"
 									value={pagination.pageSize}
 									onChange={(e) => setPagination(prev => ({
 										...prev,
 										pageIndex: 0,
 										pageSize: Number(e.target.value)
 									}))}
+									disabled={loading}
 								>
 									{[10, 25, 50].map(n => <option key={n} value={n}>{n}</option>)}
 								</select>
@@ -264,38 +277,38 @@ export default function DataTable({ initialPageSize = 10 }: Props) {
 						</div>
 						<div className="flex items-center gap-4">
 							<span className="text-sm text-gray-600">
-								Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount() || 1}
+								{loading ? 'Loading…' : `Page ${currentPage} of ${pageCount}`}
 							</span>
 							<div className="flex items-center gap-2">
 								<PaginationButton
 									label="First"
 									icon="double-left"
 									onClick={() => table.setPageIndex(0)}
-									disabled={!table.getCanPreviousPage()}
+									disabled={loading || !table.getCanPreviousPage()}
 								/>
 								<PaginationButton
 									label="Prev"
 									icon="left"
 									onClick={() => table.previousPage()}
-									disabled={!table.getCanPreviousPage()}
+									disabled={loading || !table.getCanPreviousPage()}
 								/>
 								<PaginationButton
 									label="Next"
 									icon="right"
 									onClick={() => table.nextPage()}
-									disabled={!table.getCanNextPage()}
+									disabled={loading || !table.getCanNextPage()}
 								/>
 								<PaginationButton
 									label="Last"
 									icon="double-right"
 									onClick={() => table.setPageIndex(Math.max(table.getPageCount() - 1, 0))}
-									disabled={!table.getCanNextPage()}
+									disabled={loading || !table.getCanNextPage()}
 								/>
 							</div>
 						</div>
 					</div>
-				</div>
-			)}
+				)}
+			</div>
 		</div>
 	);
 }

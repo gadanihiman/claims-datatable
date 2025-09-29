@@ -20,10 +20,13 @@ const coverageStyles: Record<CoverageType, string> = {
 	Secondary: 'bg-[#FCF8CA] text-[#E98E34]'
 };
 
-export function CoverageBadge({ type = 'Primary' }: { type?: CoverageType }) {
+type CoverageBadgeProps = { type?: CoverageType; fullWidth?: boolean };
+
+export function CoverageBadge({ type = 'Primary', fullWidth = false }: CoverageBadgeProps) {
 	return (
 		<span className={clsx(
-			'inline-flex w-fit items-center justify-center rounded-[4px] px-4 py-1 text-[12px] font-semibold',
+			'inline-flex items-center justify-center rounded-[4px] px-4 py-2 text-[12px] font-semibold',
+			fullWidth ? 'w-full' : 'w-fit',
 			coverageStyles[type]
 		)}>
 			{type}
