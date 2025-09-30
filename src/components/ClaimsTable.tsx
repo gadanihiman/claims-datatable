@@ -75,7 +75,7 @@ const columns: ColumnDef<ClaimRow>[] = [
     accessorKey: 'userInitials',
     header: 'User',
     cell: info => (
-      <div className="inline-flex h-[30px] w-[28px] items-center justify-center rounded-full bg-[#E0FEEF] text-sm font-semibold">
+      <div className="inline-flex h-[30px] w-[28px] items-center justify-center rounded-full bg-[#E0FEEF] text-[#196443] text-sm font-semibold">
         {info.getValue<string>()}
       </div>
     ),
