@@ -4,8 +4,8 @@ import * as React from 'react';
 import type { ColumnDef, FilterFn, Row } from '@tanstack/react-table';
 import { ClaimRow, Status } from '@/types';
 import { formatD, formatT, formatUSD } from '@/lib/format';
-import { CoverageBadge, SyncPill } from './Badge';
-import DataTable, { DataTableEmptyProps, DataTableToolbarProps } from './DataTable';
+import { CoverageBadge, SyncPill } from '@/components/Badge';
+import DataTable, { DataTableEmptyProps, DataTableToolbarProps } from '@/components/DataTable';
 
 const patientNameFilter: FilterFn<ClaimRow> = (row: Row<ClaimRow>, _columnId: string, filterValue: unknown) => {
   const value = String(filterValue ?? '').toLowerCase();
