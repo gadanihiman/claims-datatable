@@ -19,6 +19,7 @@ import { formatUSD, formatD, formatT } from '@/lib/format';
 import Spinner from './Spinner';
 import { CoverageBadge, SyncPill } from './Badge';
 import { clsx } from 'clsx';
+import PaginationButton from "@/components/PaginationButton";
 
 type Props = { initialPageSize?: number };
 
@@ -188,7 +189,6 @@ export default function DataTable({ initialPageSize = 10 }: Props) {
 					<option value="REJECTED">REJECTED</option>
 					<option value="CALL">CALL</option>
 				</select>
-
 			</div>
 
 			{/* Table / Empty / Loading */}
@@ -320,42 +320,4 @@ function Sortable(label: string) {
 function SortIndicator({ dir }: { dir: false | 'asc' | 'desc' }) {
 	if (!dir) return <span aria-hidden>↕︎</span>;
 	return <span aria-hidden>{dir === 'asc' ? '↑' : '↓'}</span>;
-}
-
-type PaginationIcon = 'left' | 'right' | 'double-left' | 'double-right';
-
-type PaginationButtonProps = {
-	label: string;
-	icon: PaginationIcon;
-	onClick: () => void;
-	disabled?: boolean;
-};
-
-function PaginationButton({ label, icon, onClick, disabled }: PaginationButtonProps) {
-	const iconSrc: Record<PaginationIcon, { src: string; rotate?: string }> = {
-		left: { src: '/Caret Left from DNTEL.png', rotate: 'rotate-180' },
-		right: { src: '/Caret Right from DNTEL.png' },
-		'double-left': { src: '/Caret Double Left from DNTEL.png' },
-		'double-right': { src: '/Caret Double Right from DNTEL.png' }
-	};
-
-	return (
-		<button
-			type="button"
-			onClick={onClick}
-			disabled={disabled}
-			className="inline-flex h-9 w-9 items-center justify-center rounded-[14px] border border-gray-200 bg-white shadow-sm transition hover:bg-emerald-50 disabled:cursor-not-allowed disabled:opacity-40"
-			aria-label={label}
-		>
-			<span className="relative flex h-4 w-4 items-center justify-center">
-				<Image
-					src={iconSrc[icon].src}
-					alt={label}
-					width={18}
-					height={18}
-					className={iconSrc[icon].rotate ? iconSrc[icon].rotate : undefined}
-				/>
-			</span>
-		</button>
-	);
 }
