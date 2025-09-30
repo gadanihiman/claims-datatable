@@ -135,11 +135,11 @@ export default function ClaimsTable({ initialPageSize = 10 }: ClaimsTableProps) 
         value={globalFilter ?? ''}
         onChange={e => setGlobalFilter(e.target.value)}
         placeholder="Search name…"
-        className="h-9 w-64 rounded-md border border-gray-300 px-3 text-sm outline-none focus:ring-2 focus:ring-gray-300"
+        className="bg-white h-9 w-64 rounded-md border border-gray-300 px-3 text-sm outline-none focus:ring-2 focus:ring-gray-300"
         aria-label="Search name"
       />
       <select
-        className="h-9 rounded-md border border-gray-300 px-2 text-sm"
+        className="cursor-pointer bg-white h-9 rounded-md border border-gray-300 px-2 text-sm"
         value={statusFilter}
         onChange={(e) => {
           const value = (e.target.value || '') as Status | '';
