@@ -25,7 +25,7 @@ type CoverageBadgeProps = { type?: CoverageType; fullWidth?: boolean };
 export function CoverageBadge({ type = 'Primary', fullWidth = false }: CoverageBadgeProps) {
 	return (
 		<span className={clsx(
-			'inline-flex items-center justify-center rounded-[4px] px-4 py-2 text-[12px] font-semibold',
+			'inline-flex items-center justify-center rounded-[4px] px-4 py-1 text-[12px] font-semibold',
 			fullWidth ? 'w-full' : 'w-fit',
 			coverageStyles[type]
 		)}>
@@ -37,13 +37,13 @@ export function CoverageBadge({ type = 'Primary', fullWidth = false }: CoverageB
 export function SyncPill({ state, detail }: { state: 'Synced'|'Not synced'; detail?: string }) {
 	const synced = state === 'Synced';
 	return (
-		<div className="flex flex-col items-center gap-1 leading-tight text-center">
+		<div className="flex w-full min-w-[120px] flex-col items-center gap-1 leading-tight text-center">
 			<span
 				className={clsx(
-					'inline-flex w-full items-center justify-center gap-2 rounded-[4px] border px-3 py-1 text-[12px] font-semibold',
+					'inline-flex w-full min-h-[32px] items-center justify-center gap-2 rounded-[4px] border px-3 py-1 text-[12px] font-semibold',
 					synced
-						? 'border-emerald-200 bg-emerald-50 text-emerald-600'
-						: 'border-gray-200 bg-gray-100 text-gray-500'
+						? 'border-[#F0F9EB] bg-[#F0F9EB] text-[#01A151]'
+						: 'border-[#EAEAEA] bg-[#EAEAEA] text-[#838580]'
 				)}
 			>
 				{synced ? <CheckIcon /> : <AlertIcon />}

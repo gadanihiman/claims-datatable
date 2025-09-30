@@ -92,6 +92,7 @@ export default function DataTable({ initialPageSize = 10 }: Props) {
 		{
 			accessorKey: 'lastUpdated',
 			header: Sortable('Last Updated'),
+			size: 160,
 			cell: info => {
 				const iso = info.getValue<string>();
 				return (
@@ -113,9 +114,9 @@ export default function DataTable({ initialPageSize = 10 }: Props) {
 			),
 			enableSorting: false
 		},
-		{ accessorKey: 'dateSent', header: 'Date Sent', cell: i => formatD(i.getValue<string>()), enableSorting: false },
-		{ accessorKey: 'dateSentOrig', header: 'Date Sent Orig', cell: i => formatD(i.getValue<string>()), enableSorting: false },
-		{ accessorKey: 'pmsSyncStatus', header: 'PMS Sync Status', cell: i => (
+		{ accessorKey: 'dateSent', header: 'Date Sent', cell: i => formatD(i.getValue<string>()), enableSorting: false, size: 160 },
+		{ accessorKey: 'dateSentOrig', header: 'Date Sent Orig', cell: i => formatD(i.getValue<string>()), enableSorting: false, size: 160 },
+		{ accessorKey: 'pmsSyncStatus', header: 'PMS Sync Status', size: 200, minSize: 180, cell: i => (
 			<SyncPill
 				state={i.getValue<'Synced'|'Not synced'>()}
 				detail={i.row.original.pmsSyncStatusDetail ?? 'Status modified today'}
