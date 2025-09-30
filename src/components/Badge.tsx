@@ -1,20 +1,6 @@
 import { clsx } from 'clsx';
 import type { CoverageType } from '@/types';
 
-export function StatusBadge({ value }: { value: string }) {
-	const map: Record<string,string> = {
-		RESUBMITTED: 'bg-blue-50 text-blue-700 border border-blue-200',
-		PENDING: 'bg-amber-50 text-amber-700 border border-amber-200',
-		REJECTED: 'bg-rose-50 text-rose-700 border border-rose-200',
-		CALL: 'bg-purple-50 text-purple-700 border border-purple-200',
-	};
-	return (
-		<span className={clsx('px-2 py-0.5 text-xs rounded-md', map[value] ?? 'bg-gray-100')}>
-      {value}
-    </span>
-	);
-}
-
 const coverageStyles: Record<CoverageType, string> = {
 	Primary: 'bg-[#EBF9FE] text-[#23A9EB]',
 	Secondary: 'bg-[#FCF8CA] text-[#E98E34]'
@@ -22,7 +8,7 @@ const coverageStyles: Record<CoverageType, string> = {
 
 type CoverageBadgeProps = { type?: CoverageType; fullWidth?: boolean };
 
-export function CoverageBadge({ type = 'Primary', fullWidth = false }: CoverageBadgeProps) {
+export const CoverageBadge = ({ type = 'Primary', fullWidth = false }: CoverageBadgeProps) => {
 	return (
 		<span className={clsx(
 			'inline-flex items-center justify-center rounded-[4px] px-4 py-1 text-[12px] font-semibold',
@@ -34,7 +20,7 @@ export function CoverageBadge({ type = 'Primary', fullWidth = false }: CoverageB
 	);
 }
 
-export function SyncPill({ state, detail }: { state: 'Synced'|'Not synced'; detail?: string }) {
+export const SyncPill = ({ state, detail }: { state: 'Synced'|'Not synced'; detail?: string }) => {
 	const synced = state === 'Synced';
 	return (
 		<div className="flex w-full min-w-[120px] flex-col items-center gap-1 leading-tight text-center">
@@ -54,7 +40,7 @@ export function SyncPill({ state, detail }: { state: 'Synced'|'Not synced'; deta
 	);
 }
 
-function CheckIcon() {
+const CheckIcon = () => {
 	return (
 		<svg className="h-4 w-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
 			<path d="m4.5 8.5 2.5 2.5 4.5-5" />
@@ -62,7 +48,7 @@ function CheckIcon() {
 	);
 }
 
-function AlertIcon() {
+const AlertIcon = () => {
 	return (
 		<svg className="h-4 w-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
 			<circle cx="8" cy="8" r="5.25" />

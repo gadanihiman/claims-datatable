@@ -113,7 +113,7 @@ type ClaimsTableProps = {
   initialPageSize?: number;
 };
 
-export default function ClaimsTable({ initialPageSize = 10 }: ClaimsTableProps) {
+const ClaimsTable = ({ initialPageSize = 10 }: ClaimsTableProps) => {
   const [data, setData] = React.useState<ClaimRow[] | null>(null);
   const [loading, setLoading] = React.useState(true);
   const [statusFilter, setStatusFilter] = React.useState<Status | ''>('');
@@ -198,3 +198,5 @@ export default function ClaimsTable({ initialPageSize = 10 }: ClaimsTableProps) 
     />
   );
 }
+
+export default ClaimsTable;

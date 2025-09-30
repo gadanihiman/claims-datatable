@@ -65,7 +65,7 @@ const DEFAULT_ROW_CLASS = '';
 const DEFAULT_CELL_CLASS = 'px-4 py-3';
 const DEFAULT_HEADER_CELL_CLASS = 'px-4 py-3';
 
-export default function DataTable<TData>({
+const DataTable = <TData,>({
   columns,
   data,
   loading = false,
@@ -89,7 +89,7 @@ export default function DataTable<TData>({
   pageSizeIconAlt = 'Toggle page size',
   loadingOverlayOffset = 0,
   loadingLabel = 'Loading…'
-}: DataTableProps<TData>) {
+}: DataTableProps<TData>) => {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [pagination, setPagination] = useState<PaginationState>({ pageIndex: 0, pageSize: initialPageSize });
   const [globalFilter, setGlobalFilter] = useState('');
@@ -256,7 +256,9 @@ export default function DataTable<TData>({
   );
 }
 
-function SortIndicator({ dir }: { dir: false | 'asc' | 'desc' }) {
+const SortIndicator = ({ dir }: { dir: false | 'asc' | 'desc' }) => {
   if (!dir) return <span aria-hidden>↕︎</span>;
   return <span aria-hidden>{dir === 'asc' ? '↑' : '↓'}</span>;
 }
+
+export default DataTable;

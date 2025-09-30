@@ -1,6 +1,6 @@
 import { clsx } from 'clsx';
 
-type SpinnerProps = {
+export type SpinnerProps = {
 	size?: 'sm' | 'md' | 'lg';
 	label?: string;
 	className?: string;
@@ -12,7 +12,7 @@ const sizeMap: Record<NonNullable<SpinnerProps['size']>, string> = {
 	lg: 'h-8 w-8 border-[3px]'
 };
 
-export default function Spinner({ size = 'md', label, className }: SpinnerProps) {
+const Spinner = ({ size = 'md', label, className }: SpinnerProps) => {
 	return (
 		<div className={clsx('flex flex-col items-center justify-center gap-3 py-8', className)}>
 			<div
@@ -25,3 +25,5 @@ export default function Spinner({ size = 'md', label, className }: SpinnerProps)
 		</div>
 	);
 }
+
+export default Spinner;
