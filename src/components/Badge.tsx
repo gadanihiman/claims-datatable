@@ -11,7 +11,7 @@ type CoverageBadgeProps = { type?: CoverageType; fullWidth?: boolean };
 export const CoverageBadge = ({ type = 'Primary', fullWidth = false }: CoverageBadgeProps) => {
 	return (
 		<span className={clsx(
-			'inline-flex items-center justify-center rounded-[4px] px-4 py-1 text-[12px] font-semibold',
+			'inline-flex items-center min-w-[121px] h-[24px] justify-center rounded-[4px] px-4 text-[12px] font-semibold',
 			fullWidth ? 'w-full' : 'w-fit',
 			coverageStyles[type]
 		)}>
@@ -26,7 +26,7 @@ export const SyncPill = ({ state, detail }: { state: 'Synced'|'Not synced'; deta
 		<div className="flex w-full min-w-[120px] flex-col items-center gap-1 leading-tight text-center">
 			<span
 				className={clsx(
-					'inline-flex w-full min-h-[32px] items-center justify-center gap-2 rounded-[4px] border px-3 py-1 text-[12px] font-semibold',
+					'inline-flex w-full min-h-[24px] items-center justify-center gap-2 rounded-[4px] border px-3 py-1 text-[12px] font-semibold',
 					synced
 						? 'border-[#F0F9EB] bg-[#F0F9EB] text-[#01A151]'
 						: 'border-[#EAEAEA] bg-[#EAEAEA] text-[#838580]'
