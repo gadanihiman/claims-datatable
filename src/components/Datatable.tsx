@@ -1,323 +1,262 @@
 'use client';
 
-import * as React from 'react';
+import { CSSProperties, ReactNode, useCallback, useEffect, useState } from "react";
 import {
-	ColumnDef,
-	flexRender,
-	getCoreRowModel,
-	getFilteredRowModel,
-	getPaginationRowModel,
-	getSortedRowModel,
-	PaginationState,
-	SortingState,
-	useReactTable
+  ColumnDef,
+  ColumnFiltersState,
+  FilterFn,
+  PaginationState,
+  SortingState,
+  Table,
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  useReactTable
 } from '@tanstack/react-table';
+import clsx from 'clsx';
 import Image from 'next/image';
-import type { FilterFn, Row } from '@tanstack/react-table';
-import { ClaimRow, Status } from '@/types';
-import { formatUSD, formatD, formatT } from '@/lib/format';
 import Spinner from './Spinner';
-import { CoverageBadge, SyncPill } from './Badge';
-import { clsx } from 'clsx';
-import PaginationButton from "@/components/PaginationButton";
+import PaginationButton from './PaginationButton';
 
-type Props = { initialPageSize?: number };
+export type DataTableToolbarProps<TData> = {
+  table: Table<TData>;
+  globalFilter: string;
+  setGlobalFilter: (value: string) => void;
+};
 
-export default function DataTable({ initialPageSize = 10 }: Props) {
-	const [data, setData] = React.useState<ClaimRow[] | null>(null);
-	const [loading, setLoading] = React.useState(true);
-	const [sorting, setSorting] = React.useState<SortingState>([]);
-	const [globalFilter, setGlobalFilter] = React.useState('');     // name search
-	const [statusFilter, setStatusFilter] = React.useState<Status | ''>('');
-	const [pagination, setPagination] = React.useState<PaginationState>({
-		pageIndex: 0,
-		pageSize: initialPageSize
-	});
+export type DataTableEmptyProps<TData> = {
+  table: Table<TData>;
+  reset: () => void;
+};
 
-	React.useEffect(() => {
-		setPagination(prev => ({ ...prev, pageSize: initialPageSize }));
-	}, [initialPageSize]);
+type DataTableProps<TData> = {
+  columns: ColumnDef<TData, unknown>[];
+  data: TData[];
+  loading?: boolean;
+  initialPageSize?: number;
+  renderToolbar?: (props: DataTableToolbarProps<TData>) => ReactNode;
+  renderEmpty?: (props: DataTableEmptyProps<TData>) => ReactNode;
+  onResetFilters?: () => void;
+  globalFilterFn?: FilterFn<TData>;
+  getRowId?: (originalRow: TData, index: number, parent?: unknown) => string;
+  cardClassName?: string;
+  toolbarClassName?: string;
+  tableClassName?: string;
+  theadClassName?: string;
+  tbodyClassName?: string;
+  tbodyStyle?: CSSProperties;
+  rowClassName?: string;
+  cellClassName?: string;
+  headerCellClassName?: string;
+  paginationLabel?: string;
+  pageSizeIconSrc?: string;
+  pageSizeIconAlt?: string;
+  loadingOverlayOffset?: number;
+  loadingLabel?: string;
+};
 
-	React.useEffect(() => {
-		let mounted = true;
-		fetch('/claims.json')
-			.then(r => r.json())
-			.then((rows: ClaimRow[]) => { if (mounted) setData(rows); })
-			.finally(() => setLoading(false));
-		return () => { mounted = false; };
-	}, []);
+const DEFAULT_CARD_CLASS = 'rounded-2xl border border-gray-200 bg-white shadow-sm';
+const DEFAULT_TABLE_CLASS = 'min-w-full text-sm';
+const DEFAULT_THEAD_CLASS = 'bg-gray-50 text-left text-xs uppercase text-gray-500';
+const DEFAULT_TBODY_CLASS = '';
+const DEFAULT_ROW_CLASS = '';
+const DEFAULT_CELL_CLASS = 'px-4 py-3';
+const DEFAULT_HEADER_CELL_CLASS = 'px-4 py-3';
 
-	const columns = React.useMemo<ColumnDef<ClaimRow>[]>(() => [
-		{
-			accessorKey: 'patientName',
-			header: Sortable('Patient'),
-			cell: ({ row }) => (
-				<div className="flex flex-col">
-					<span className="font-medium">{row.original.patientName}</span>
-					<span className="text-[12px] text-gray-500">ID: {row.original.patientId}</span>
-				</div>
-			)
-		},
-		{
-			accessorKey: 'serviceDate',
-			header: Sortable('Service Date'),
-			cell: ({ getValue }) => formatD(getValue() as string),
-			sortingFn: 'datetime'
-		},
-		{
-			accessorKey: 'insuranceCarrier',
-			header: 'Insurance Carrier',
-			cell: info => (
-				<div className="flex flex-col gap-2">
-					<span className="text-[12px] uppercase leading-snug text-[#112A24]">{info.getValue<string>()}</span>
-					<CoverageBadge type={info.row.original.coverageType ?? 'Primary'} fullWidth />
-				</div>
-			),
-			enableSorting: false
-		},
-		{
-			accessorKey: 'amountCents',
-			header: 'Amount',
-			cell: info => formatUSD(info.getValue<number>()),
-			enableSorting: false
-		},
-		{
-			accessorKey: 'status',
-			header: Sortable('Status'),
-			cell: info => (
-				<span className="text-[12px] uppercase tracking-wide text-emerald-900">
-					NCOF - {info.getValue<Status>()}
-				</span>
-			)
-		},
-		{
-			accessorKey: 'lastUpdated',
-			header: Sortable('Last Updated'),
-			size: 160,
-			cell: info => {
-				const iso = info.getValue<string>();
-				return (
-					<div className="flex flex-col leading-tight">
-						<span className="text-sm">{formatD(iso)}</span>
-						<span className="text-[11px] font-semibold text-[#74827F]">{formatT(iso)}</span>
-					</div>
-				);
-			},
-			sortingFn: 'datetime'
-		},
-		{
-			accessorKey: 'userInitials',
-			header: 'User',
-			cell: info => (
-				<div className="inline-flex h-[30px] w-[28px] items-center justify-center rounded-full bg-[#E0FEEF] text-sm font-semibold">
-					{info.getValue<string>()}
-				</div>
-			),
-			enableSorting: false
-		},
-		{ accessorKey: 'dateSent', header: 'Date Sent', cell: i => formatD(i.getValue<string>()), enableSorting: false, size: 160 },
-		{ accessorKey: 'dateSentOrig', header: 'Date Sent Orig', cell: i => formatD(i.getValue<string>()), enableSorting: false, size: 160 },
-		{ accessorKey: 'pmsSyncStatus', header: 'PMS Sync Status', size: 200, minSize: 180, cell: i => (
-			<SyncPill
-				state={i.getValue<'Synced'|'Not synced'>()}
-				detail={i.row.original.pmsSyncStatusDetail ?? 'Status modified today'}
-			/>
-		), enableSorting: false },
-		{
-			accessorKey: 'provider',
-			header: 'Provider',
-			enableSorting: false,
-			cell: info => (
-				<div className="flex flex-col leading-tight">
-					<span className="text-sm text-[#112A24]">{info.getValue<string>()}</span>
-					<span className="text-xs font-semibold text-[#B3B3B3]">ID:{info.row.original.providerId}</span>
-				</div>
-			)
-		}
-	], []);
+export default function DataTable<TData>({
+  columns,
+  data,
+  loading = false,
+  initialPageSize = 10,
+  renderToolbar,
+  renderEmpty,
+  onResetFilters,
+  globalFilterFn,
+  getRowId,
+  cardClassName,
+  toolbarClassName,
+  tableClassName,
+  theadClassName,
+  tbodyClassName,
+  tbodyStyle,
+  rowClassName,
+  cellClassName,
+  headerCellClassName,
+  paginationLabel = 'Rows per page',
+  pageSizeIconSrc,
+  pageSizeIconAlt = 'Toggle page size',
+  loadingOverlayOffset = 0,
+  loadingLabel = 'Loading…'
+}: DataTableProps<TData>) {
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [pagination, setPagination] = useState<PaginationState>({ pageIndex: 0, pageSize: initialPageSize });
+  const [globalFilter, setGlobalFilter] = useState('');
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 
-	// Global filter = "name contains"
-	const globalFilterFn = React.useCallback<FilterFn<ClaimRow>>((row: Row<ClaimRow>, _columnId: string, filterValue: unknown) => {
-		const value = String(filterValue ?? '').toLowerCase();
-		const patient = row.original.patientName.toLowerCase();
-		return patient.includes(value);
-	}, []);
+  useEffect(() => {
+    setPagination(prev => ({ ...prev, pageSize: initialPageSize }));
+  }, [initialPageSize]);
 
-	// Single-select status column filter
-	const columnFilters = React.useMemo(() => {
-		return statusFilter ? [{ id: 'status', value: statusFilter }] : [];
-	}, [statusFilter]);
+  const table = useReactTable({
+    data,
+    columns,
+    state: { sorting, globalFilter, columnFilters, pagination },
+    onSortingChange: setSorting,
+    onPaginationChange: setPagination,
+    onColumnFiltersChange: setColumnFilters,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    globalFilterFn,
+    getRowId
+  });
 
-	const table = useReactTable({
-		data: data ?? [],
-		columns,
-		state: { sorting, globalFilter, columnFilters, pagination },
-		onSortingChange: setSorting,
-		onPaginationChange: setPagination,
-		globalFilterFn,
-		getCoreRowModel: getCoreRowModel(),
-		getSortedRowModel: getSortedRowModel(),
-		getFilteredRowModel: getFilteredRowModel(),
-		getPaginationRowModel: getPaginationRowModel(),
-		manualPagination: false
-	});
+  const empty = !loading && table.getRowModel().rows.length === 0;
+  const pageCount = table.getPageCount() || 1;
+  const currentPage = Math.min(table.getState().pagination.pageIndex + 1, pageCount);
 
-	const empty = !loading && table.getRowModel().rows.length === 0;
-	const pageCount = table.getPageCount() || 1;
-	const currentPage = Math.min(table.getState().pagination.pageIndex + 1, pageCount);
+  const handleReset = useCallback(() => {
+    setGlobalFilter('');
+    table.resetColumnFilters();
+    onResetFilters?.();
+  }, [table, onResetFilters]);
 
-	return (
-		<div className="space-y-3">
-			{/* Controls */}
-			<div className="flex flex-wrap items-center gap-2">
-				<input
-					value={globalFilter ?? ''}
-					onChange={e => setGlobalFilter(e.target.value)}
-					placeholder="Search name…"
-					className="h-9 w-64 rounded-md border border-gray-300 px-3 text-sm outline-none focus:ring-2 focus:ring-gray-300"
-					aria-label="Search name"
-				/>
-				<select
-					className="h-9 rounded-md border border-gray-300 px-2 text-sm"
-					value={statusFilter}
-					onChange={(e) => setStatusFilter((e.target.value || '') as Status | '')}
-					aria-label="Status filter"
-				>
-					<option value="">All Statuses</option>
-					<option value="RESUBMITTED">RESUBMITTED</option>
-					<option value="PENDING">PENDING</option>
-					<option value="REJECTED">REJECTED</option>
-					<option value="CALL">CALL</option>
-				</select>
-			</div>
+  return (
+    <div className="space-y-3">
+      {renderToolbar ? (
+        <div className={toolbarClassName ?? 'flex flex-wrap items-center gap-2'}>
+          {renderToolbar({ table, globalFilter, setGlobalFilter })}
+        </div>
+      ) : null}
 
-			{/* Table / Empty / Loading */}
-			<div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
-				<div className="relative min-h-[360px]">
-					{empty ? (
-						<div className="flex h-full flex-col items-center justify-center gap-3 py-16 text-center">
-							<p className="text-sm text-gray-600">No results match your filters.</p>
-							<button
-								onClick={() => { setGlobalFilter(''); setStatusFilter(''); }}
-								className="mt-1 rounded-md bg-black px-4 py-2 text-sm text-white"
-							>
-								Clear filters
-							</button>
-						</div>
-					) : (
-						<div className="overflow-x-auto">
-							<table className="min-w-full text-sm">
-								<thead className="bg-white text-left text-xs capitalize text-[#546661]">
-								{table.getHeaderGroups().map(hg => (
-									<tr key={hg.id}>
-										{hg.headers.map(h => (
-											<th key={h.id} className="px-4 py-3">
-												{h.isPlaceholder ? null : (
-													<div
-														className={clsx('flex items-center gap-1 text-sm font-[400] tracking-wide', h.column.getCanSort() && 'cursor-pointer select-none text-gray-600 hover:text-gray-900')}
-														onClick={h.column.getToggleSortingHandler()}
-													>
-														{flexRender(h.column.columnDef.header, h.getContext())}
-														{h.column.getCanSort() && <SortIndicator dir={h.column.getIsSorted()} />}
-													</div>
-												)}
-											</th>
-										))}
-									</tr>
-								))}
-								</thead>
-								<tbody
-									className="divide-y divide-gray-100 text-[#112A24]"
-									style={{ fontFamily: 'PolySans, "Helvetica Neue", Arial, sans-serif', fontWeight: 400 }}
-								>
-								{table.getRowModel().rows.map(r => (
-									<tr key={r.id} className="bg-white">
-										{r.getVisibleCells().map(c => (
-											<td key={c.id} className="px-4 py-4 align-top text-left">
-												{flexRender(c.column.columnDef.cell, c.getContext())}
-											</td>
-										))}
-									</tr>
-								))}
-								</tbody>
-							</table>
-						</div>
-					)}
-					{loading ? (
-						<div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center bg-white/80 backdrop-blur-sm">
-							<Spinner size="lg" label="Loading claims…" />
-						</div>
-					) : null}
-				</div>
-				{empty ? null : (
-					<div className="flex flex-wrap items-center justify-between gap-4 border-t border-gray-100 px-6 py-5">
-						<div className="flex items-center gap-3">
-							<div className="relative">
-								<select
-									className="appearance-none rounded-[12px] border border-gray-200 bg-white px-4 py-2 pr-9 text-sm font-[400] shadow-sm transition disabled:cursor-not-allowed disabled:opacity-60"
-									value={pagination.pageSize}
-									onChange={(e) => setPagination(prev => ({
-										...prev,
-										pageIndex: 0,
-										pageSize: Number(e.target.value)
-									}))}
-									disabled={loading}
-								>
-									{[10, 25, 50].map(n => <option key={n} value={n}>{n}</option>)}
-								</select>
-								<Image
-									src="/Caret Up Down from DNTEL.png"
-									alt="Toggle rows per page"
-									width={16}
-									height={16}
-									className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2"
-								/>
-							</div>
-							<span className="text-sm font-medium text-gray-600">Rows per page</span>
-						</div>
-						<div className="flex items-center gap-4">
-							<span className="text-sm text-gray-600">
-								{loading ? 'Loading…' : `Page ${currentPage} of ${pageCount}`}
-							</span>
-							<div className="flex items-center gap-2">
-								<PaginationButton
-									label="First"
-									icon="double-left"
-									onClick={() => table.setPageIndex(0)}
-									disabled={loading || !table.getCanPreviousPage()}
-								/>
-								<PaginationButton
-									label="Prev"
-									icon="right"
-									onClick={() => table.previousPage()}
-									disabled={loading || !table.getCanPreviousPage()}
-								/>
-								<PaginationButton
-									label="Next"
-									icon="left"
-									onClick={() => table.nextPage()}
-									disabled={loading || !table.getCanNextPage()}
-								/>
-								<PaginationButton
-									label="Last"
-									icon="double-right"
-									onClick={() => table.setPageIndex(Math.max(table.getPageCount() - 1, 0))}
-									disabled={loading || !table.getCanNextPage()}
-								/>
-							</div>
-						</div>
-					</div>
-				)}
-			</div>
-		</div>
-	);
-}
+      <div className={cardClassName ?? DEFAULT_CARD_CLASS}>
+        <div className="relative min-h-[360px]">
+          {empty ? (
+            renderEmpty ? (
+              renderEmpty({ table, reset: handleReset })
+            ) : (
+              <div className="flex h-full flex-col items-center justify-center gap-3 py-16 text-center">
+                <p className="text-sm text-gray-600">No results match your filters.</p>
+              </div>
+            )
+          ) : (
+            <div className="overflow-x-auto">
+              <table className={tableClassName ?? DEFAULT_TABLE_CLASS}>
+                <thead className={theadClassName ?? DEFAULT_THEAD_CLASS}>
+                  {table.getHeaderGroups().map(headerGroup => (
+                    <tr key={headerGroup.id}>
+                      {headerGroup.headers.map(header => (
+                        <th key={header.id} className={headerCellClassName ?? DEFAULT_HEADER_CELL_CLASS}>
+                          {header.isPlaceholder ? null : (
+                            <div
+                              className={clsx(
+                                'flex items-center gap-1 text-sm font-semibold tracking-wide',
+                                header.column.getCanSort() && 'cursor-pointer select-none text-gray-600 hover:text-gray-900'
+                              )}
+                              onClick={header.column.getToggleSortingHandler()}
+                            >
+                              {flexRender(header.column.columnDef.header, header.getContext())}
+                              {header.column.getCanSort() && <SortIndicator dir={header.column.getIsSorted()} />}
+                            </div>
+                          )}
+                        </th>
+                      ))}
+                    </tr>
+                  ))}
+                </thead>
+                <tbody className={tbodyClassName ?? DEFAULT_TBODY_CLASS} style={tbodyStyle}>
+                  {table.getRowModel().rows.map(row => (
+                    <tr key={row.id} className={rowClassName ?? DEFAULT_ROW_CLASS}>
+                      {row.getVisibleCells().map(cell => (
+                        <td key={cell.id} className={cellClassName ?? DEFAULT_CELL_CLASS}>
+                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
 
-function Sortable(label: string) {
-	return label;
+          {loading ? (
+            <div
+              className="pointer-events-none absolute left-0 right-0 bottom-0 z-10 flex items-center justify-center bg-white/80 backdrop-blur-sm"
+              style={{ top: loadingOverlayOffset }}
+            >
+              <Spinner size="lg" label={loadingLabel} />
+            </div>
+          ) : null}
+        </div>
+
+        {empty ? null : (
+          <div className="flex flex-wrap items-center justify-between gap-4 border-t border-gray-100 px-6 py-5">
+            <div className="flex items-center gap-3">
+              <div className="relative">
+                <select
+                  className="appearance-none rounded-[12px] border border-gray-200 bg-white px-4 py-2 pr-9 text-sm font-semibold shadow-sm transition disabled:cursor-not-allowed disabled:opacity-60"
+                  value={table.getState().pagination.pageSize}
+                  onChange={(e) => table.setPageSize(Number(e.target.value))}
+                  disabled={loading}
+                >
+                  {[10, 25, 50].map(n => (
+                    <option key={n} value={n}>{n}</option>
+                  ))}
+                </select>
+                {pageSizeIconSrc ? (
+                  <Image
+                    src={pageSizeIconSrc}
+                    alt={pageSizeIconAlt}
+                    width={16}
+                    height={16}
+                    className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2"
+                  />
+                ) : null}
+              </div>
+              <span className="text-sm font-medium text-gray-600">{paginationLabel}</span>
+            </div>
+            <div className="flex items-center gap-4">
+              <span className="text-sm text-gray-600">
+                {loading ? 'Loading…' : `Page ${currentPage} of ${pageCount}`}
+              </span>
+              <div className="flex items-center gap-2">
+                <PaginationButton
+                  label="First"
+                  icon="double-left"
+                  onClick={() => table.setPageIndex(0)}
+                  disabled={loading || !table.getCanPreviousPage()}
+                />
+                <PaginationButton
+                  label="Prev"
+                  icon="left"
+                  onClick={() => table.previousPage()}
+                  disabled={loading || !table.getCanPreviousPage()}
+                />
+                <PaginationButton
+                  label="Next"
+                  icon="right"
+                  onClick={() => table.nextPage()}
+                  disabled={loading || !table.getCanNextPage()}
+                />
+                <PaginationButton
+                  label="Last"
+                  icon="double-right"
+                  onClick={() => table.setPageIndex(Math.max(table.getPageCount() - 1, 0))}
+                  disabled={loading || !table.getCanNextPage()}
+                />
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
 }
 
 function SortIndicator({ dir }: { dir: false | 'asc' | 'desc' }) {
-	if (!dir) return <span aria-hidden>↕︎</span>;
-	return <span aria-hidden>{dir === 'asc' ? '↑' : '↓'}</span>;
+  if (!dir) return <span aria-hidden>↕︎</span>;
+  return <span aria-hidden>{dir === 'asc' ? '↑' : '↓'}</span>;
 }
