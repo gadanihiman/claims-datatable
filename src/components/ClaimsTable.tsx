@@ -33,10 +33,11 @@ const columns: ColumnDef<ClaimRow>[] = [
   {
     accessorKey: 'insuranceCarrier',
     header: 'Insurance Carrier',
+	  size: 121,
     cell: info => (
-      <div className="flex flex-col gap-2">
+      <div className="w-[121px] flex flex-col gap-2">
         <span className="text-[12px] uppercase leading-snug text-[#112A24]">{info.getValue<string>()}</span>
-        <CoverageBadge type={info.row.original.coverageType ?? 'Primary'} fullWidth />
+        <CoverageBadge type={info.row.original.coverageType ?? 'Primary'} />
       </div>
     ),
     enableSorting: false
