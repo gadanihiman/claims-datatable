@@ -1,11 +1,11 @@
 'use client';
 
-import * as React from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import type { ColumnDef, FilterFn, Row } from '@tanstack/react-table';
 import { ClaimRow, Status } from '@/types';
 import { formatD, formatT, formatUSD } from '@/lib/format';
-import { CoverageBadge, SyncPill } from './Badge';
-import DataTable, { DataTableEmptyProps, DataTableToolbarProps } from './DataTable';
+import { CoverageBadge, SyncPill } from '@/components/Badge';
+import DataTable, { DataTableEmptyProps, DataTableToolbarProps } from '@/components/Datatable';
 
 const patientNameFilter: FilterFn<ClaimRow> = (row: Row<ClaimRow>, _columnId: string, filterValue: unknown) => {
   const value = String(filterValue ?? '').toLowerCase();
@@ -114,11 +114,11 @@ type ClaimsTableProps = {
 };
 
 const ClaimsTable = ({ initialPageSize = 10 }: ClaimsTableProps) => {
-  const [data, setData] = React.useState<ClaimRow[] | null>(null);
-  const [loading, setLoading] = React.useState(true);
-  const [statusFilter, setStatusFilter] = React.useState<Status | ''>('');
+  const [data, setData] = useState<ClaimRow[] | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [statusFilter, setStatusFilter] = useState<Status | ''>('');
 
-  React.useEffect(() => {
+  useEffect(() => {
     let mounted = true;
     fetch('/claims.json')
       .then(r => r.json())
@@ -129,7 +129,7 @@ const ClaimsTable = ({ initialPageSize = 10 }: ClaimsTableProps) => {
     return () => { mounted = false; };
   }, []);
 
-  const toolbar = React.useCallback(({ table, globalFilter, setGlobalFilter }: DataTableToolbarProps<ClaimRow>) => (
+  const toolbar = useCallback(({ table, globalFilter, setGlobalFilter }: DataTableToolbarProps<ClaimRow>) => (
     <>
       <input
         value={globalFilter ?? ''}
@@ -157,7 +157,7 @@ const ClaimsTable = ({ initialPageSize = 10 }: ClaimsTableProps) => {
     </>
   ), [statusFilter, setStatusFilter]);
 
-  const emptyState = React.useCallback(({ reset }: DataTableEmptyProps<ClaimRow>) => (
+  const emptyState = useCallback(({ reset }: DataTableEmptyProps<ClaimRow>) => (
     <div className="flex h-full flex-col items-center justify-center gap-3 py-16 text-center">
       <p className="text-sm text-gray-600">No results match your filters.</p>
       <button
