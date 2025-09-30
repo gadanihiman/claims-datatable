@@ -197,7 +197,7 @@ const DataTable = <TData,>({
 						<div className="flex items-center gap-3">
 							<div className="relative">
 								<select
-									className="appearance-none rounded-[12px] border border-gray-200 bg-white px-4 py-2 pr-9 text-sm font-semibold shadow-sm transition disabled:cursor-not-allowed disabled:opacity-60"
+									className="cursor-pointer appearance-none rounded-[12px] border border-gray-200 bg-white px-4 py-2 pr-9 text-sm font-semibold shadow-sm transition disabled:cursor-not-allowed disabled:opacity-60"
 									value={table.getState().pagination.pageSize}
 									onChange={(e) => table.setPageSize(Number(e.target.value))}
 									disabled={loading}
